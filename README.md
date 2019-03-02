@@ -10,8 +10,8 @@ allows for synchronisation across system boundaries.
 
 ## Documentation
 
-  * Module Commands
-  * Redis Key Space
+  * [Module Commands](doc/api.md)
+  * [Redis Key Space](doc/keyspace.md)
 
 
 ### Source Repository
