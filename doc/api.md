@@ -34,3 +34,9 @@ the command).
 ### Distributed Sync API Commands
 
 [RMDSYNC.CONNECT](api/connect.md)
+
+[RMDSYNC.SYNC](api/sync.md)
+
+[RMDSYNC.SIGNAL](api/signal.md)
+
+[RMDSYNC.DISCONNECT](api/disconnect.md)

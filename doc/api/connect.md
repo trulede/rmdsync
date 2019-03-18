@@ -23,7 +23,8 @@ TODO
 
 ### Return Value
 
-* Integer reply: **sync_id** - a unique identifier for this Sync Name and Client Name. This ID is used for all subsequent DSync API commands. The Sync ID is unique within a Redis DB - the value is a hash derived from both parameters of the RMDSYNC.CONNECT command.
+* String reply: 'OK' - The client is connected to the Sync Instance.
+
 
 
 ### Example
@@ -33,21 +34,17 @@ __Python:__
 import redis
 
 r = redis.from_url("redis://localhost:6379")
-id = r.execute_command("rmdsync.connect", "foo", "bar")
-print(id) # 0
-
-# Connect a second time ... id will be unchanged.
-id = r.execute_command("rmdsync.connect", "foo", "bar")
-print(id) # 0
+rc = r.execute_command("rmdsync.connect", "foo", "bar")
+print(rc) # 'OK'
 
 # Get the timeinfo of the Sync Instance.
-timeinfo = r.execute_command("rmdsync.sync", id, -1)
-print(timeinfo) # [b'41342452345', [b'0']]
+timeinfo = r.execute_command("rmdsync.sync", "foo", -1)
+print(timeinfo) # [b'0', b'0']
 ```
 
 __Redis CLI:__
 ```cli
 redis> rmdsync.connect foo bar
-(integer) 0
-redis[2]>
+(string) 'OK'
+redis>
 ```
