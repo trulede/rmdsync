@@ -5,7 +5,7 @@
 
 ### Synopsis
 
-<strong><samp>rmdsync.sync sync_name wakeup</samp></strong>
+<strong><samp>rmdsync.sync sync_name client_name wakeup</samp></strong>
 
 
 #### Description
@@ -22,6 +22,7 @@ earlier wakeup.
 | Parameter | Type | Description
 | --- | --- | ---
 | sync_name | String | Name of the Sync Instance to wait on (caller is blocked).
+| client_name | String | Unique name of the client which is already connected to the Sync Instance via the  [RMDSYNC.CONNECT](./connect.md) command.
 | wakeup | Integer | [-1, 0, uS] Wakeup time in uS. The wakeup time is relative to the current time of the Sync Instance, effectively a wakeup in X uS. A value of -1 return the current Sync Instance time and a value of 0 indicates to wake up at the next default wakeup time of the Sync Instance - see Redis Keyspace for more details.
 
 ### Return Value
@@ -42,15 +43,15 @@ rc = r.execute_command("rmdsync.connect", "foo", "bar")
 print(rc) # 'OK'
 
 # Get the timeinfo of the Sync Instance.
-timeinfo = r.execute_command("rmdsync.sync", "foo", -1)
+timeinfo = r.execute_command("rmdsync.sync", "foo", "bar", -1)
 print(timeinfo) # [b'0', b'0']
 
 # Block for 5000 uS.
-timeinfo = r.execute_command("rmdsync.sync", "foo", 5000)
+timeinfo = r.execute_command("rmdsync.sync", "foo", "bar", 5000)
 print(timeinfo) # [b'5000', b'5000']
 
 # Block at the default cadence of the Sync Instance (in this case 10000 uS).
-timeinfo = r.execute_command("rmdsync.sync", "foo", 0)
+timeinfo = r.execute_command("rmdsync.sync", "foo", "bar", 0)
 print(timeinfo) # [b'15000', b'10000']
 
 rc = r.execute_command("rmdsync.disconnect", "foo", "bar")
@@ -61,13 +62,13 @@ __Redis CLI:__
 ```cli
 redis> rmdsync.connect foo bar
 (string) 'OK'
-redis> rmdsync.sync foo -1
+redis> rmdsync.sync foo bar -1
 1) (integer) 0
 2) (integer) 0
-redis> rmdsync.sync foo 5000
+redis> rmdsync.sync foo bar 5000
 1) (integer) 5000
 2) (integer) 5000
-redis> rmdsync.sync foo 0
+redis> rmdsync.sync foo bar 0
 1) (integer) 15000
 2) (integer) 10000
 redis> rmdsync.disconnect foo bar
