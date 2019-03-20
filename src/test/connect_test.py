@@ -26,6 +26,7 @@ class TestRmdsyncConnect(object):
 
 
         rc = r.execute_command("rmdsync.connect", sync_instance, client_foo)
+        assert rc == "OK"
         assert r.hlen(sync_config) >= 2
         assert r.hget(sync_config, "name") == sync_instance
         assert r.hget(sync_config, "timebase_us") == "5000" # Default to 5 mS
@@ -33,6 +34,7 @@ class TestRmdsyncConnect(object):
         assert r.sismember(sync_clients, client_foo) == 1
 
         rc = r.execute_command("rmdsync.connect", sync_instance, client_bar)
+        assert rc == "OK"
         assert r.hlen(sync_config) >= 2
         assert r.hget(sync_config, "name") == sync_instance
         assert r.hget(sync_config, "timebase_us") == "5000" # Default to 5 mS
@@ -41,6 +43,7 @@ class TestRmdsyncConnect(object):
         assert r.sismember(sync_clients, client_bar) == 1
 
         rc = r.execute_command("rmdsync.disconnect", sync_instance, client_foo)
+        assert rc == "OK"
         assert r.hlen(sync_config) >= 2
         assert r.hget(sync_config, "name") == sync_instance
         assert r.hget(sync_config, "timebase_us") == "5000" # Default to 5 mS
@@ -65,9 +68,10 @@ class TestRmdsyncConnect(object):
         r.flushall()
         assert r.hlen(sync_config) == 0
         assert r.scard(sync_clients) == 0
-        
+
 
         rc = r.execute_command("rmdsync.connect", sync_instance, client_foo)
+        assert rc == "OK"
         assert r.hlen(sync_config) >= 2
         assert r.hget(sync_config, "name") == sync_instance
         assert r.hget(sync_config, "timebase_us") == "5000" # Default to 5 mS
@@ -78,12 +82,14 @@ class TestRmdsyncConnect(object):
         assert r.hget(sync_config, "timebase_us") == "123456"
 
         rc = r.execute_command("rmdsync.disconnect", sync_instance, client_foo)
+        assert rc == "OK"
         assert r.hlen(sync_config) >= 2
         assert r.hget(sync_config, "name") == sync_instance
         assert r.hget(sync_config, "timebase_us") == "123456"
         assert r.scard(sync_clients) == 0
 
         rc = r.execute_command("rmdsync.connect", sync_instance, client_foo)
+        assert rc == "OK"
         assert r.hlen(sync_config) >= 2
         assert r.hget(sync_config, "name") == sync_instance
         assert r.hget(sync_config, "timebase_us") == "123456"
