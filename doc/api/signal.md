@@ -26,8 +26,9 @@ on that Sync Instance, via the [RMDSYNC.SYNC](./sync.md) command, will be releas
 * Array reply:
     * [0] - Integer reply: The number of Clients which were waiting on the
     Sync Instance, and were subsequently released by the Signal.
-    * [1] - Integer reply: the total number of Clients connected to the Sync
+    * [1] - Integer reply: The total number of Clients connected to the Sync
     Instance at the time the Signal was raised.
+    * [2] - Integer reply: The Sync Instance time when the Signal was raised.
 
 
 ### Example
@@ -59,7 +60,7 @@ print(rc) # 'OK'
 
 # Signal any Clients waiting on a RMDSYNC.SYNC command.
 rc = r.execute_command("rmdsync.signal", "foo", 0)
-print(rc) # '[1, 1]'
+print(rc) # '[1, 1, b'0']'
 
 rc = r.execute_command("rmdsync.disconnect", "foo", "bar")
 print(rc) # 'OK'
