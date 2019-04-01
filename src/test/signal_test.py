@@ -10,7 +10,7 @@ logger = logging.getLogger()
 
 
 @pytest.mark.incremental
-class TestRmdsyncConnect(object):
+class TestRmdsyncSignal(object):
 
     def sync_thread(r, sync_instance, client, resp):
         # Call Sync with paramter 0 and wait for a signal.
@@ -58,7 +58,7 @@ class TestRmdsyncConnect(object):
         assert r.sismember(sync_clients, client_foo) == 1
 
         foo_t0 = time()
-        foo_resp= [None]
+        foo_resp = [None]
         foo_t = Thread(target = sync_thread, args = (r, sync_instance, client_foo, foo_resp))
         foo_t.start()
 
@@ -73,3 +73,9 @@ class TestRmdsyncConnect(object):
         assert foo_resp[0][0] > 0
         assert foo_resp[0][1][0] == rc[2] # Sync Instance time.
         assert foo_resp[0][1][1] == rc[2] # Sync Instance time since last release (which was t = 0).
+
+        rc = r.execute_command("rmdsync.disconnect", sync_instance, client_foo)
+        assert r.hlen(sync_config) >= 2
+        assert r.hget(sync_config, "name") == sync_instance
+        assert r.hget(sync_config, "timebase_us") == "5000" # Default to 5 mS
+        assert r.scard(sync_clients) == 0
