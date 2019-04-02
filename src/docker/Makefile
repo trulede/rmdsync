@@ -20,7 +20,6 @@ clean:
 	-if [ -n "$$(docker images -q $(REPO):latest)" ]; then docker rmi -f $(REPO):latest; fi
 
 docker:
-	mkdir -p $(BUILD_DIR)/mods
-	cp -r ../rmdsync/rmdsync.so $(BUILD_DIR)/mods/rmdsync.so
-	-docker rmi -f $(REPO):latest
+	mkdir -p $(BUILD_DIR)
+	cp -r ../rmdsync $(BUILD_DIR)/rmdsync
 	docker build -t $(REPO):latest .
