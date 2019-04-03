@@ -2,7 +2,7 @@
 DOCKER_DIR = docker
 
 
-.PHONY: default help clean cleanall build test deploy
+.PHONY: default help clean cleanall build test deploy start stop pytest
 
 default: build
 
@@ -23,8 +23,17 @@ build:
 	cd $(DOCKER_DIR) && $(MAKE) docker
 
 test:
+	$(MAKE) start &&													\
+	pytest -rx -x --tb=short ./test || ret=$$? &&						\
+	$(MAKE) stop && exit $$ret
+
+start:
 	cd $(DOCKER_DIR) && $(MAKE) start
-	#pytest -rx -x --tb=short
+
+pytest:
+	pytest -rx -x --tb=short ./test
+
+stop:
 	cd $(DOCKER_DIR) && $(MAKE) stop
 
 deploy:
