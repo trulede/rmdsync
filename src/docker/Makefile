@@ -24,7 +24,7 @@ clean:
 
 docker:
 	mkdir -p $(BUILD_DIR)
-	cp -r ../rmdsync $(BUILD_DIR)/rmdsync
+	rsync -r ../rmdsync $(BUILD_DIR)
 	docker build -t $(REPO):latest .
 
 start:
