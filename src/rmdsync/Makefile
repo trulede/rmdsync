@@ -1,7 +1,7 @@
 RM_INCLUDE_DIR=$(shell pwd)
 DEBUGFLAGS = -g -ggdb -O2
 INCLUDE_DIRS = -I"$(RM_INCLUDE_DIR)"
-CFLAGS = $(INCLUDE_DIRS) -Wall $(DEBUGFLAGS) -fPIC -std=gnu99  -D_GNU_SOURCE
+CFLAGS = $(INCLUDE_DIRS) -Wall -Werror $(DEBUGFLAGS) -fPIC -std=gnu99  -D_GNU_SOURCE
 CC:=$(shell sh -c 'type $(CC) >/dev/null 2>/dev/null && echo $(CC) || echo gcc')
 
 SHOBJ_CFLAGS ?=  -fno-common -g -ggdb
