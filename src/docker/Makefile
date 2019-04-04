@@ -2,7 +2,7 @@
 REPO = rmdsync
 BUILD_DIR = build
 
-.PHONY: default help docker clean cleanall start stop
+.PHONY: default help docker clean cleanall start stop bash
 
 default: docker
 
@@ -28,7 +28,7 @@ docker:
 	docker build -t $(REPO):latest .
 
 start:
-	docker run --name $(REPO) -d --rm=true $(REPO):latest
+	docker run --name $(REPO) -d --rm=true -p 6379:6379/tcp $(REPO):latest
 	@echo "Wait 60 seconds for container to start ..."
 	@for i in `seq 60` ; do \
 		docker ps -f name=$(REPO) --format "{{.ID}} status={{.Status}}" | grep -q 'status=Up' ; \
@@ -36,6 +36,9 @@ start:
 		sleep 1 ; \
 		echo "$$i ..." ; \
 	done
+
+bash:
+	docker exec -it $$(docker ps -q -f name=$(REPO)) /bin/bash
 
 stop:
 	docker rm -f $$(docker ps -q -f name=$(REPO))

@@ -1,6 +1,7 @@
 import pytest
 import logging
 import redis
+import os
 
 
 
@@ -22,9 +23,6 @@ def pytest_runtest_setup(item):
 
 @pytest.fixture(scope="module")
 def r():
-    redis_url = os.getenv('REDIS_URL', "redis://localhost:6379")
+    redis_url = "redis://localhost:6379"
     r = redis.from_url(redis_url)
-    r.client_setname("foobar")
-    logger.info('Redis : {}'.format(r.client_getname()))
     yield r
-    logger.info('Redis : {}'.format(r.client_getname()))
