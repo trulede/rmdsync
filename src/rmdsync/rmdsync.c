@@ -8,20 +8,61 @@
 /**
  *  RMDSYNC.CONNECT sync_name client_name
  */
+
+static void _init_sync_config(RedisModuleCtx *ctx, RedisModuleString *sync_name)
+{
+    // TODO RedisModule_AutoMemory(ctx); // really need that? in caller
+    RedisModuleKey *key = NULL;
+    RedisModuleString *name = NULL;
+    RedisModuleString *rms = NULL;
+    const char *s = NULL;
+
+    // TODO consider if sync name is valid ... space, special characters, length.
+    s = RedisModule_StringPtrLen(sync_name, NULL);
+    name = RedisModule_CreateStringPrintf(ctx, SYNC_CONFIG_KEY_FMT, s);
+    key = RedisModule_OpenKey(ctx, name, REDISMODULE_READ|REDISMODULE_WRITE);
+
+    // name
+    RedisModule_HashSet(key, REDISMODULE_HASH_NX|REDISMODULE_HASH_CFIELDS, SYNC_CONFIG_VALUE__NAME, sync_name, NULL);
+
+    // timebase_us
+    rms = RedisModule_CreateStringPrintf(ctx, SYNC_CONFIG_DEFAULT__TIMEBASE_US);
+    RedisModule_HashSet(key, REDISMODULE_HASH_NX|REDISMODULE_HASH_CFIELDS, SYNC_CONFIG_VALUE__TIMEBASE_US, rms, NULL);
+}
+
+static void _connect_sync(RedisModuleCtx *ctx, RedisModuleString *sync_name, RedisModuleString *client_name)
+{
+    RedisModuleString *key_name = NULL;
+    const char *s = NULL;
+
+    // TODO consider if sync name is valid ... space, special characters, length.
+    s = RedisModule_StringPtrLen(sync_name, NULL);
+    key_name = RedisModule_CreateStringPrintf(ctx, SYNC_CLIENTS_KEY_FMT, s);
+    RedisModule_Call(ctx, "SADD", "ss", key_name, client_name);
+}
+
+static void _start_sync_thread(RedisModuleCtx *ctx, RedisModuleString *sync_name)
+{
+    // Find it, probably put the address in the config hash ... dirty ... but
+    //  perhaps better than a linked list. at least faster. perhaps do both.
+
+    // Or start it.
+}
+
  int rmdsync_connect_RedisCommand(RedisModuleCtx *ctx, RedisModuleString **argv, int argc)
  {
      RedisModule_AutoMemory(ctx);
+
+     RedisModuleString *sync_name = NULL;
+     RedisModuleString *client_name = NULL;
+
      if (argc != 3) return RedisModule_WrongArity(ctx);
+     sync_name = argv[1];
+     client_name = argv[2];
 
-
-     // TODO Create the Sync if it does not exist.
-
-     // TODO Star the sync thread.
-
-
-     // TODO Connect the client (if not already connected).
-
-
+     _init_sync_config(ctx, sync_name);
+     _connect_sync(ctx, sync_name, client_name);
+     _start_sync_thread(ctx, sync_name);
 
      return RedisModule_ReplyWithSimpleString(ctx, "OK");
  }
@@ -30,23 +71,35 @@
 /**
  *  RMDSYNC.DISCONNECT sync_name client_name
  */
+static void _disconnect_sync(RedisModuleCtx *ctx, RedisModuleString *sync_name, RedisModuleString *client_name)
+{
+    RedisModuleString *key_name = NULL;
+    const char *s = NULL;
+
+    // TODO consider if sync name is valid ... space, special characters, length.
+    s = RedisModule_StringPtrLen(sync_name, NULL);
+    key_name = RedisModule_CreateStringPrintf(ctx, SYNC_CLIENTS_KEY_FMT, s);
+    RedisModule_Call(ctx, "SREM", "ss", key_name, client_name);
+}
+
+static void _stop_sync_thread(RedisModuleCtx *ctx, RedisModuleString *sync_name)
+{
+    // If the client list/set is empty, stop the thread, othwerwise ... NOP
+}
+
 int rmdsync_disconnect_RedisCommand(RedisModuleCtx *ctx, RedisModuleString **argv, int argc)
 {
     RedisModule_AutoMemory(ctx);
+
+    RedisModuleString *sync_name = NULL;
+    RedisModuleString *client_name = NULL;
+
     if (argc != 3) return RedisModule_WrongArity(ctx);
+    sync_name = argv[1];
+    client_name = argv[2];
 
-    // TODO Delete the client from the Sync.
-
-    // TODO Stop the sync thread.
-
-
-    // TODO Delete the Sync??? Or keep the configuration and have clients in a separate hash/list?
-    //    Dict for config with: name = sync
-    //    List or Dict for clients, when empty, not active: name.clients
-    //        Benfit of Dict, place to store wakeup time (relative to 0).
-    //        But could also use a sorted list for the next wakeup ... which could be faster/smarter.
-
-
+    _disconnect_sync(ctx, sync_name, client_name);
+    _stop_sync_thread(ctx, sync_name);
 
     return RedisModule_ReplyWithSimpleString(ctx, "OK");
 }
