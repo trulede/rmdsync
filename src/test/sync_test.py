@@ -29,20 +29,22 @@ class TestRmdsyncSync(object):
         resp[0][1] = rc
 
 
-    def test__sync(self, r):
-        sync_instance = "stinky_foo"
-        sync_config = sync_instance+".config"
-        sync_clients = sync_instance+".clients"
-        client_foo = "foo"
+    def tXXest__sync(self, r):
+        sync_instance = b'stinky_foo'
+        sync_config = b'stinky_foo.config'
+        sync_clients = b'stinky_foo.clients'
+        sync_thread = b'stinky_foo.thread'
+        client_foo = b'foo'
 
         r.flushall()
         assert r.hlen(sync_config) == 0
         assert r.scard(sync_clients) == 0
+        assert not r.exists(sync_thread)
 
         r.execute_command("rmdsync.connect", sync_instance, client_foo)
         assert r.scard(sync_clients) == 1
         assert r.sismember(sync_clients, client_foo) == 1
-
+        assert r.exists(sync_thread)
 
         def do_sync_and_check(r, sync_instance, client, wakeup, delay, expected_time, expected_interval):
             resp = [None]
@@ -70,12 +72,13 @@ class TestRmdsyncSync(object):
         rc = r.execute_command("rmdsync.disconnect", sync_instance, client_foo)
         assert r.hlen(sync_config) >= 2
         assert r.hget(sync_config, "name") == sync_instance
-        assert r.hget(sync_config, "timebase_us") == "5000"
+        assert r.hget(sync_config, "timebase_us") == b'5000'
         assert r.scard(sync_clients) == 0
+        assert not r.exists(sync_thread)
 
 
 
-    def test__sync_signal(self, r):
+    def tXXest__sync_signal(self, r):
         sync_instance = "stinky_foo"
         sync_config = sync_instance+".config"
         sync_clients = sync_instance+".clients"
@@ -111,7 +114,7 @@ class TestRmdsyncSync(object):
 
 
 
-    def test__multiple_sync_clients(self, r):
+    def tXXest__multiple_sync_clients(self, r):
         sync_instance = "stinky_foo"
         sync_config = sync_instance+".config"
         sync_clients = sync_instance+".clients"
@@ -179,7 +182,7 @@ class TestRmdsyncSync(object):
 
 
 
-    def test__sync_time_on_blocking_sync_instance(self, r):
+    def tXXest__sync_time_on_blocking_sync_instance(self, r):
         sync_instance = "stinky_foo"
         sync_config = sync_instance+".config"
         sync_clients = sync_instance+".clients"

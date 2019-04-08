@@ -22,7 +22,7 @@ class TestRmdsyncSignal(object):
         resp[0][1] = rc
 
 
-    def test__signal_no_client():
+    def tXXest__signal_no_client():
         sync_instance = "stinky_foo"
         sync_config = sync_instance+".config"
         sync_clients = sync_instance+".clients"
@@ -42,7 +42,7 @@ class TestRmdsyncSignal(object):
         assert rc[2] == 0 # Sync Instance time should be 0? (since it does not exist)
 
 
-    def test__signal(self, r):
+    def tXXest__signal(self, r):
         sync_instance = "stinky_foo"
         sync_config = sync_instance+".config"
         sync_clients = sync_instance+".clients"

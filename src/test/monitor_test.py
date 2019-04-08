@@ -10,13 +10,12 @@ logger = logging.getLogger()
 
 @pytest.mark.incremental
 class TestRmdsyncMonitor(object):
-    def __init__(self, model):
-        self._list = []
+    _list = []
 
     def _handler(self, message):
         self._list.append(message['data'].decode())
 
-    def test__monitor_connect(self, r):
+    def tXXest__monitor_connect(self, r):
         sync_instance = "stinky_foo"
         sync_config = sync_instance+".config"
         sync_clients = sync_instance+".clients"
