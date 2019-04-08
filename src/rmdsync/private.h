@@ -11,6 +11,8 @@
 
 #define SYNC_CLIENTS_KEY_FMT                                 "%s.clients"
 
+#define SYNC_THREAD_KEY_FMT                                 "%s.thread"
+
 
 
 /* sync_thread.c */

@@ -1,6 +1,8 @@
 #define REDISMODULE_EXPERIMENTAL_API
 #include "redismodule.h"
 #include "sds.h"
+#include <stdlib.h>
+#include <pthread.h>
 
 #include "private.h"
 
@@ -43,29 +45,43 @@ static void _connect_sync(RedisModuleCtx *ctx, RedisModuleString *sync_name, Red
 
 static void _start_sync_thread(RedisModuleCtx *ctx, RedisModuleString *sync_name)
 {
-    // Find it, probably put the address in the config hash ... dirty ... but
-    //  perhaps better than a linked list. at least faster. perhaps do both.
+    RedisModuleKey *key = NULL;
+    RedisModuleString *key_name = NULL;
+    RedisModuleString *rms_thread_id = NULL;
+    const char *s = NULL;
+    pthread_t thread_id;
 
-    // Or start it.
+    s = RedisModule_StringPtrLen(sync_name, NULL);
+
+    key_name = RedisModule_CreateStringPrintf(ctx, SYNC_THREAD_KEY_FMT, s);
+    key = RedisModule_OpenKey(ctx, key_name, REDISMODULE_READ);
+    if (key == NULL) {
+        // No key, no thread. Start the thread and write the key.
+        key = RedisModule_OpenKey(ctx, key_name, REDISMODULE_READ|REDISMODULE_WRITE);
+        pthread_create(&thread_id, NULL, sync_thread_main,  (void *)sync_name);
+        rms_thread_id = RedisModule_CreateStringFromLongLong(ctx, thread_id);
+        RedisModule_StringSet(key, rms_thread_id);
+    }
+    RedisModule_CloseKey(key);
 }
 
- int rmdsync_connect_RedisCommand(RedisModuleCtx *ctx, RedisModuleString **argv, int argc)
- {
-     RedisModule_AutoMemory(ctx);
+int rmdsync_connect_RedisCommand(RedisModuleCtx *ctx, RedisModuleString **argv, int argc)
+{
+    RedisModule_AutoMemory(ctx);
 
-     RedisModuleString *sync_name = NULL;
-     RedisModuleString *client_name = NULL;
+    RedisModuleString *sync_name = NULL;
+    RedisModuleString *client_name = NULL;
 
-     if (argc != 3) return RedisModule_WrongArity(ctx);
-     sync_name = argv[1];
-     client_name = argv[2];
+    if (argc != 3) return RedisModule_WrongArity(ctx);
+    sync_name = argv[1];
+    client_name = argv[2];
 
-     _init_sync_config(ctx, sync_name);
-     _connect_sync(ctx, sync_name, client_name);
-     _start_sync_thread(ctx, sync_name);
+    _init_sync_config(ctx, sync_name);
+    _connect_sync(ctx, sync_name, client_name);
+    _start_sync_thread(ctx, sync_name);
 
-     return RedisModule_ReplyWithSimpleString(ctx, "OK");
- }
+    return RedisModule_ReplyWithSimpleString(ctx, "OK");
+}
 
 
 /**
@@ -84,7 +100,26 @@ static void _disconnect_sync(RedisModuleCtx *ctx, RedisModuleString *sync_name, 
 
 static void _stop_sync_thread(RedisModuleCtx *ctx, RedisModuleString *sync_name)
 {
-    // If the client list/set is empty, stop the thread, othwerwise ... NOP
+    RedisModuleKey *key = NULL;
+    RedisModuleString *key_name = NULL;
+    const char *s = NULL;
+    size_t len;
+    pthread_t thread_id;
+
+    s = RedisModule_StringPtrLen(sync_name, NULL);
+
+    key_name = RedisModule_CreateStringPrintf(ctx, SYNC_CLIENTS_KEY_FMT, s);
+    key = RedisModule_OpenKey(ctx, key_name, REDISMODULE_READ);
+    if (key == NULL) {
+        // Get the Thread Id.
+        key_name = RedisModule_CreateStringPrintf(ctx, SYNC_THREAD_KEY_FMT, s);
+        key = RedisModule_OpenKey(ctx, key_name, REDISMODULE_READ|REDISMODULE_WRITE);
+        s = RedisModule_StringDMA(key, &len, REDISMODULE_READ);
+        thread_id = atoll(s);
+        pthread_join(thread_id, NULL); // Thread will finish when it detects Clients Key is empty/gone.
+        RedisModule_DeleteKey(key);
+    }
+    RedisModule_CloseKey(key);
 }
 
 int rmdsync_disconnect_RedisCommand(RedisModuleCtx *ctx, RedisModuleString **argv, int argc)
