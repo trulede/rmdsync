@@ -32,6 +32,7 @@ class TestRmdsyncConnect(object):
         assert r.hlen(sync_config) >= 2
         assert r.hget(sync_config, "name") == sync_instance
         assert r.hget(sync_config, "timebase_us") == b'5000' # Default to 5 mS
+        assert r.hget(sync_config, "sample_freq_us") == b'50'
         assert r.scard(sync_clients) == 1
         assert r.sismember(sync_clients, client_foo) == 1
         assert r.exists(sync_thread)
@@ -42,6 +43,7 @@ class TestRmdsyncConnect(object):
         assert r.hlen(sync_config) >= 2
         assert r.hget(sync_config, "name") == sync_instance
         assert r.hget(sync_config, "timebase_us") == b'5000' # Default to 5 mS
+        assert r.hget(sync_config, "sample_freq_us") == b'50'
         assert r.scard(sync_clients) == 2
         assert r.sismember(sync_clients, client_foo) == 1
         assert r.sismember(sync_clients, client_bar) == 1
@@ -53,6 +55,7 @@ class TestRmdsyncConnect(object):
         assert r.hlen(sync_config) >= 2
         assert r.hget(sync_config, "name") == sync_instance
         assert r.hget(sync_config, "timebase_us") == b'5000' # Default to 5 mS
+        assert r.hget(sync_config, "sample_freq_us") == b'50'
         assert r.scard(sync_clients) == 1
         assert r.sismember(sync_clients, client_foo) == 0
         assert r.sismember(sync_clients, client_bar) == 1
@@ -63,6 +66,7 @@ class TestRmdsyncConnect(object):
         assert r.hlen(sync_config) >= 2
         assert r.hget(sync_config, "name") == sync_instance
         assert r.hget(sync_config, "timebase_us") == b'5000' # Default to 5 mS
+        assert r.hget(sync_config, "sample_freq_us") == b'50'
         assert r.scard(sync_clients) == 0
         assert not r.exists(sync_thread)
 
@@ -85,18 +89,22 @@ class TestRmdsyncConnect(object):
         assert r.hlen(sync_config) >= 2
         assert r.hget(sync_config, "name") == sync_instance
         assert r.hget(sync_config, "timebase_us") == b'5000' # Default to 5 mS
+        assert r.hget(sync_config, "sample_freq_us") == b'50'
         assert r.scard(sync_clients) == 1
         assert r.sismember(sync_clients, client_foo) == 1
         assert r.exists(sync_thread)
 
         r.hset(sync_config, "timebase_us", b'123456')
+        r.hset(sync_config, "sample_freq_us", b'100')
         assert r.hget(sync_config, "timebase_us") == b'123456'
+        assert r.hget(sync_config, "sample_freq_us") == b'100'
 
         rc = r.execute_command("rmdsync.disconnect", sync_instance, client_foo)
         assert rc == b'OK'
         assert r.hlen(sync_config) >= 2
         assert r.hget(sync_config, "name") == sync_instance
         assert r.hget(sync_config, "timebase_us") == b'123456'
+        assert r.hget(sync_config, "sample_freq_us") == b'100'
         assert r.scard(sync_clients) == 0
         assert not r.exists(sync_thread)
 
@@ -105,6 +113,7 @@ class TestRmdsyncConnect(object):
         assert r.hlen(sync_config) >= 2
         assert r.hget(sync_config, "name") == sync_instance
         assert r.hget(sync_config, "timebase_us") == b'123456'
+        assert r.hget(sync_config, "sample_freq_us") == b'100'
         assert r.scard(sync_clients) == 1
         assert r.sismember(sync_clients, client_foo) == 1
         assert r.exists(sync_thread)
@@ -131,6 +140,7 @@ class TestRmdsyncConnect(object):
             assert rc == b'OK'
             assert r.hget(sync_config, "name") == sync_instance
             assert r.hget(sync_config, "timebase_us") == b'5000'
+            assert r.hget(sync_config, "sample_freq_us") == b'50'
             assert r.scard(sync_clients) == 1
             assert r.sismember(sync_clients, sync) == 1
             assert r.exists(sync_thread)

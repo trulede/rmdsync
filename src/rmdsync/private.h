@@ -8,6 +8,8 @@
 #define SYNC_CONFIG_VALUE__NAME                             "name"
 #define SYNC_CONFIG_VALUE__TIMEBASE_US                      "timebase_us"
 #define SYNC_CONFIG_DEFAULT__TIMEBASE_US                    "5000"
+#define SYNC_CONFIG_VALUE__SAMPLE_FREQ_US                   "sample_freq_us"
+#define SYNC_CONFIG_DEFAULT__SAMPLE_FREQ_US                 "50"
 
 #define SYNC_CLIENTS_KEY_FMT                                "%s.clients"
 

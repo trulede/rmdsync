@@ -30,6 +30,10 @@ static void _init_sync_config(RedisModuleCtx *ctx, RedisModuleString *sync_name)
     // timebase_us
     rms = RedisModule_CreateStringPrintf(ctx, SYNC_CONFIG_DEFAULT__TIMEBASE_US);
     RedisModule_HashSet(key, REDISMODULE_HASH_NX|REDISMODULE_HASH_CFIELDS, SYNC_CONFIG_VALUE__TIMEBASE_US, rms, NULL);
+
+    // sample_freq_us
+    rms = RedisModule_CreateStringPrintf(ctx, SYNC_CONFIG_DEFAULT__SAMPLE_FREQ_US);
+    RedisModule_HashSet(key, REDISMODULE_HASH_NX|REDISMODULE_HASH_CFIELDS, SYNC_CONFIG_VALUE__SAMPLE_FREQ_US, rms, NULL);
 }
 
 static void _connect_sync(RedisModuleCtx *ctx, RedisModuleString *sync_name, RedisModuleString *client_name)
