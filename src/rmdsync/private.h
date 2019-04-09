@@ -24,4 +24,8 @@ extern void __log__(RedisModuleCtx *ctx, const char* fmt, ...);
 extern void __monitor__(RedisModuleCtx *ctx, const char* fmt, ...);
 
 
+/* clock.c */
+extern void __sleep_us__(int sleep_us);
+
+
 #endif /* RMDSYNC_PRIVATE_H */
