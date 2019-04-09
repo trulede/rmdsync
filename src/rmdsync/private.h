@@ -9,9 +9,11 @@
 #define SYNC_CONFIG_VALUE__TIMEBASE_US                      "timebase_us"
 #define SYNC_CONFIG_DEFAULT__TIMEBASE_US                    "5000"
 
-#define SYNC_CLIENTS_KEY_FMT                                 "%s.clients"
+#define SYNC_CLIENTS_KEY_FMT                                "%s.clients"
 
 #define SYNC_THREAD_KEY_FMT                                 "%s.thread"
+
+#define SYNC_REQUESTS_KEY_FMT                               "%s.requests"
 
 
 

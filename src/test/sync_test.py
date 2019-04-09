@@ -57,16 +57,16 @@ class TestRmdsyncSync(object):
 
 
         # -1, initial condition - 0 0.
-        do_sync_and_check(y, sync_instance, client_foo, -1, 0.1, 0, 0)
+        do_sync_and_check(r, sync_instance, client_foo, -1, 0.1, 0, 0)
         # x uS, a few cycles.
-        do_sync_and_check(y, sync_instance, client_foo, 4000, 0.1, 4000, 4000)
-        do_sync_and_check(y, sync_instance, client_foo, 5000, 0.1, 9000, 5000)
-        do_sync_and_check(y, sync_instance, client_foo, 6000, 0.1, 15000, 6000)
-        do_sync_and_check(y, sync_instance, client_foo, -1, 0.1, 15000, 0)
+        do_sync_and_check(r, sync_instance, client_foo, 4000, 0.1, 4000, 4000)
+        do_sync_and_check(r, sync_instance, client_foo, 5000, 0.1, 9000, 5000)
+        do_sync_and_check(r, sync_instance, client_foo, 6000, 0.1, 15000, 6000)
+        do_sync_and_check(r, sync_instance, client_foo, -1, 0.1, 15000, 0)
         # 0, default cycles: see keyspace, will default to 5000
-        do_sync_and_check(y, sync_instance, client_foo, 0, 0.1, 20000, 5000)
-        do_sync_and_check(y, sync_instance, client_foo, 0, 0.1, 25000, 5000)
-        do_sync_and_check(y, sync_instance, client_foo, 0, 0.1, 30000, 5000)
+        do_sync_and_check(r, sync_instance, client_foo, 0, 0.1, 20000, 5000)
+        do_sync_and_check(r, sync_instance, client_foo, 0, 0.1, 25000, 5000)
+        do_sync_and_check(r, sync_instance, client_foo, 0, 0.1, 30000, 5000)
 
 
         rc = r.execute_command("rmdsync.disconnect", sync_instance, client_foo)
