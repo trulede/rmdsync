@@ -13,30 +13,12 @@
 
 static int _get_client_count(RedisModuleCtx *ctx, RedisModuleString *clients_key_name)
 {
-    RedisModuleCallReply *reply;
-    int rc = -1;    // Indicate an error condition by default.
-
-    reply = RedisModule_Call(ctx, "SCARD", "s", clients_key_name);
-    if (RedisModule_CallReplyType(reply) == REDISMODULE_REPLY_INTEGER) {
-        rc = RedisModule_CallReplyInteger(reply);
-    }
-
-    RedisModule_FreeCallReply(reply);
-    return rc;
+    return redis_set_count(ctx, clients_key_name,"SCARD");
 }
 
 static int _get_sync_count(RedisModuleCtx *ctx, RedisModuleString *requests_key_name)
 {
-    RedisModuleCallReply *reply;
-    int rc = -1;    // Indicate an error condition by default.
-
-    reply = RedisModule_Call(ctx, "ZCARD", "s", requests_key_name);
-    if (RedisModule_CallReplyType(reply) == REDISMODULE_REPLY_INTEGER) {
-        rc = RedisModule_CallReplyInteger(reply);
-    }
-
-    RedisModule_FreeCallReply(reply);
-    return rc;
+    return redis_set_count(ctx, requests_key_name,"ZCARD");
 }
 
 static int _get_sync_request(RedisModuleCtx *ctx, RedisModuleString *requests_key_name)
@@ -63,40 +45,14 @@ release_sync_request_resources:
 
 static int _get_timebase(RedisModuleCtx *ctx, RedisModuleString *config_key_name)
 {
-    RedisModuleKey *key = NULL;
-    RedisModuleString *value = NULL;
-    int rc = SYNC_CONFIG_DEFAULT__TIMEBASE_US_INT;
-    const char *s = NULL;
-
-    key = RedisModule_OpenKey(ctx, config_key_name, REDISMODULE_READ);
-    if (key) {
-        RedisModule_HashGet(key, REDISMODULE_HASH_CFIELDS, SYNC_CONFIG_VALUE__TIMEBASE_US, &value, NULL);
-        s = RedisModule_StringPtrLen(value, NULL);
-        rc = atoi(s);
-        RedisModule_FreeString(ctx, value);
-        RedisModule_CloseKey(key);
-    }
-
-    return rc;
+    return redis_hash_lookup_int(ctx, config_key_name,
+        SYNC_CONFIG_VALUE__TIMEBASE_US, SYNC_CONFIG_DEFAULT__TIMEBASE_US_INT);
 }
 
 static int _get_sample_freq(RedisModuleCtx *ctx, RedisModuleString *config_key_name)
 {
-    RedisModuleKey *key = NULL;
-    RedisModuleString *value = NULL;
-    int rc = SYNC_CONFIG_DEFAULT__SAMPLE_FREQ_US_INT;
-    const char *s = NULL;
-
-    key = RedisModule_OpenKey(ctx, config_key_name, REDISMODULE_READ);
-    if (key) {
-        RedisModule_HashGet(key, REDISMODULE_HASH_CFIELDS, SYNC_CONFIG_VALUE__SAMPLE_FREQ_US, &value, NULL);
-        s = RedisModule_StringPtrLen(value, NULL);
-        rc = atoi(s);
-        RedisModule_FreeString(ctx, value);
-        RedisModule_CloseKey(key);
-    }
-
-    return rc;
+    return redis_hash_lookup_int(ctx, config_key_name,
+        SYNC_CONFIG_VALUE__SAMPLE_FREQ_US, SYNC_CONFIG_DEFAULT__SAMPLE_FREQ_US_INT);
 }
 
 

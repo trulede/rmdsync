@@ -1,6 +1,9 @@
 #ifndef RMDSYNC_PRIVATE_H
 #define RMDSYNC_PRIVATE_H
 
+#define REDISMODULE_EXPERIMENTAL_API
+#include "redismodule.h"
+
 #define RMDSYNC_MODULE_NAME         "rmdsync"
 #define RMDSYNC_MODULE_VERSION      1
 
@@ -32,6 +35,11 @@ extern void __monitor__(RedisModuleCtx *ctx, const char* fmt, ...);
 
 /* clock.c */
 extern void __sleep_us__(int sleep_us);
+
+
+/* redis.c */
+extern int redis_hash_lookup_int(RedisModuleCtx *ctx, RedisModuleString *hash, const char *field, int _default);
+extern int redis_set_count(RedisModuleCtx *ctx, RedisModuleString *set, const char *command);
 
 
 #endif /* RMDSYNC_PRIVATE_H */
